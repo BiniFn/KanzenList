@@ -124,7 +124,7 @@
         <section id="view-community" class="view pt-md">
             <div class="section-header" style="justify-content: space-between">
                 <div class="section-title-wrap"><h2>Community Forums</h2><p class="subtitle">Real-time discussions pulled from AniList networks.</p></div>
-                <button class="primary-btn" onclick="showToast('Requires OAuth Login to post.', 'warning')">+ Create Thread</button>
+                <button class="primary-btn" onclick="window.openThreadModal()">+ Create Thread</button>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
                 <div class="forum-list" id="forum-list"><div class="loader"></div></div>
@@ -132,8 +132,8 @@
                     <div class="glass-panel" style="padding: 2rem; margin:0">
                         <h3 style="margin-bottom: 1rem">Your Profile Spotlight</h3>
                         <div style="display:flex; gap:1rem; align-items:center; margin-bottom: 1.5rem">
-                            <div style="width:50px; height:50px; border-radius:50%; background:var(--accent-gradient)"></div>
-                            <div><strong>Guest User</strong><br><span class="text-muted">Level 1 Otaku</span></div>
+                            <img id="forum-profile-avatar" style="width:50px; height:50px; border-radius:50%; background:var(--accent-gradient); object-fit:cover">
+                            <div><strong id="forum-profile-name">Guest User</strong><br><span class="text-muted">Level 1 Otaku</span></div>
                         </div>
                         <div class="details-tags">
                             <span class="genre-tag">🏅 Beta Tester</span>
@@ -196,6 +196,18 @@
 
     </main>
     <div id="toast-container" class="toast-container"></div>
+    
+    <div id="thread-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+        <div class="glass-panel" style="width: 90%; max-width: 500px; padding: 2rem">
+            <h2>Create New Thread</h2>
+            <input type="text" id="thread-title" placeholder="Thread Title..." style="width:100%; border-radius:8px; padding:1rem; border:1px solid var(--glass-border); background:var(--bg-base); color:white; margin: 1rem 0;">
+            <textarea placeholder="Write your thoughts..." style="width:100%; height: 150px; border-radius:8px; padding:1rem; border:1px solid var(--glass-border); background:var(--bg-base); color:white; margin-bottom: 1rem; resize:vertical; font-family:inherit"></textarea>
+            <div style="display:flex; justify-content: flex-end; gap: 1rem;">
+                <button class="outline-btn" onclick="window.closeThreadModal()">Cancel</button>
+                <button class="primary-btn" onclick="window.submitThread()">Post Thread</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module" src="app.js"></script>
 </body>

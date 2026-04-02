@@ -1,7 +1,6 @@
 /**
  * api.js
  * Centralized data fetching layer for AniList and Jikan APIs.
- * Updated: fixed SCORE_ASC returning zeroes by enforcing minimum episode/score requirements.
  */
 
 const ANILIST_GRAPHQL_URL = 'https://graphql.anilist.co';

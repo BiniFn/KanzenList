@@ -1,6 +1,7 @@
 import { fetchAniList, fetchJikan } from './api.js';
 
 let isDarkMode = true;
+let isAuthenticated = false; // Tracks if user provided their username
 
 const views = {
     home: document.getElementById('view-home'),
@@ -147,6 +148,25 @@ function renderThreads(threads, container) {
     });
 }
 
+window.openThreadModal = function() {
+    if (!isAuthenticated) {
+        showToast("Please login via Tracker tab first!", "warning");
+        return;
+    }
+    document.getElementById('thread-modal').style.display = 'flex';
+};
+
+window.closeThreadModal = function() {
+    document.getElementById('thread-modal').style.display = 'none';
+};
+
+window.submitThread = function() {
+    const title = document.getElementById('thread-title').value;
+    if (!title) return showToast("Title required", "warning");
+    showToast("Thread created successfully! (Mocked)", "success");
+    closeThreadModal();
+};
+
 // ------ NEWS & SCHEDULE ------
 async function loadNewsAndSchedule() {
     loadedViews.news = true;
@@ -263,12 +283,16 @@ window.fetchUserTracker = async function() {
     }
 
     const u = userData.User;
-    const stats = u.statistics.anime;
-    const daysWatched = (stats.minutesWatched / 60 / 24).toFixed(1);
+    
+    // Extract safely
+    const count = u.statistics?.anime?.count || 0;
+    const episodes = u.statistics?.anime?.episodesWatched || 0;
+    const minutes = u.statistics?.anime?.minutesWatched || 0;
+    const daysWatched = (minutes / 60 / 24).toFixed(1);
 
     document.getElementById('tracker-stats').innerHTML = `
-        <div class="glass-panel text-center"><h3>${stats.count}</h3><p class="text-muted">Total Anime</p></div>
-        <div class="glass-panel text-center"><h3>${stats.episodesWatched.toLocaleString()}</h3><p class="text-muted">Episodes</p></div>
+        <div class="glass-panel text-center"><h3>${count.toLocaleString()}</h3><p class="text-muted">Total Anime</p></div>
+        <div class="glass-panel text-center"><h3>${episodes.toLocaleString()}</h3><p class="text-muted">Episodes</p></div>
         <div class="glass-panel text-center"><h3>${daysWatched}</h3><p class="text-muted">Days Watched</p></div>
     `;
 
@@ -278,12 +302,29 @@ window.fetchUserTracker = async function() {
     document.querySelector('#view-tracker > .glass-panel').style.display = 'none';
     document.getElementById('tracker-dashboard').style.display = 'block';
     
+    // Enable community features
+    isAuthenticated = true;
+    showToast(`Welcome back, ${u.name}!`, "success");
+    
+    // Switch nav button
+    const loginBtn = document.querySelector('.nav-actions button.desktop-only');
+    if(loginBtn) loginBtn.textContent = u.name;
+    
+    // Update forum profile mock
+    document.getElementById('forum-profile-avatar').src = u.avatar.large;
+    document.getElementById('forum-profile-name').textContent = u.name;
+
     // Fetch recent lists
     const listData = await fetchAniList('USER_LIST', { userId: u.id });
     const entries = listData?.MediaListCollection?.lists[0]?.entries || [];
     
     const recentGrid = document.getElementById('tracker-recent');
     recentGrid.innerHTML = '';
+    
+    if (entries.length === 0) {
+       recentGrid.innerHTML = '<p class="text-muted">No public watch history found.</p>';
+       return;
+    }
     
     entries.slice(0, 8).forEach(entry => {
         const title = entry.media.title.english || entry.media.title.romaji;
@@ -319,24 +360,6 @@ function renderMediaGrid(list, container) {
                 <div class="card-content">
                     <h3 class="card-title" title="${title}">${title}</h3>
                     <p class="card-genres">${media.genres?.[0] || media.format}</p>
-                </div>
-            </div>
-        `;
-    });
-}
-
-function renderCharactersGrid(list, container) {
-    if(!container) return;
-    container.innerHTML = '';
-    if(!list || !list.length) return container.innerHTML = 'No characters found.';
-    
-    list.forEach(char => {
-        container.innerHTML += `
-            <div class="character-card" style="position:relative; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--card-shadow); cursor:pointer" onclick="window.open('${char.url}')">
-                <img src="${char.images.jpg.image_url}" style="width:100%; height:200px; object-fit:cover">
-                <div style="position:absolute; bottom:0; padding:1.5rem 0.5rem 0.5rem; background:linear-gradient(transparent, rgba(0,0,0,0.9)); color:white; width: 100%">
-                    <div style="font-weight:700">${char.name}</div>
-                    <div style="font-size:0.8rem">❤️ ${char.favorites.toLocaleString()}</div>
                 </div>
             </div>
         `;
