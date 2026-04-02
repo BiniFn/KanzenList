@@ -5,7 +5,6 @@ let isDarkMode = true;
 const views = {
     home: document.getElementById('view-home'),
     database: document.getElementById('view-database'),
-    characters: document.getElementById('view-characters'),
     community: document.getElementById('view-community'),
     tracker: document.getElementById('view-tracker'),
     news: document.getElementById('view-news'),
@@ -17,7 +16,7 @@ const toastContainer = document.getElementById('toast-container');
 
 // State flags to prevent re-fetching unnecessarily
 const loadedViews = {
-    home: false, characters: false, community: false, news: false
+    home: false, community: false, news: false
 };
 
 function init() {
@@ -56,7 +55,6 @@ function setupNavigation() {
 
             // Lazy Load tabs
             if(page === 'home' && !loadedViews.home) loadHomeData();
-            if(page === 'characters' && !loadedViews.characters) loadCharactersData();
             if(page === 'community' && !loadedViews.community) loadCommunityData();
             if(page === 'news' && !loadedViews.news) loadNewsAndSchedule();
         });
@@ -96,13 +94,6 @@ function setupDatabaseFilters() {
         const data = await fetchAniList('DATABASE', variables);
         renderMediaGrid(data?.Page?.media, container);
     });
-}
-
-// ------ CHARACTERS ------
-async function loadCharactersData() {
-    loadedViews.characters = true;
-    const characters = await fetchJikan('/top/characters?limit=18');
-    renderCharactersGrid(characters, document.getElementById('chars-grid'));
 }
 
 // ------ COMMUNITY ------
