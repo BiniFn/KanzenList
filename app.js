@@ -239,6 +239,16 @@ window.openDetails = async function(id) {
     `;
 };
 
+window.mockLogin = function() {
+    showToast("Authenticated Layout Preview", "success");
+    document.querySelector('.auth-prompt') || document.querySelector('#view-tracker > .glass-panel').style.setProperty('display', 'none');
+    document.getElementById('tracker-dashboard').style.display = 'block';
+    
+    // Switch nav button
+    const loginBtn = document.querySelector('.nav-actions button.desktop-only');
+    if(loginBtn) loginBtn.textContent = 'My Profile';
+};
+
 function renderMediaGrid(list, container) {
     if(!container) return;
     container.innerHTML = '';

@@ -46,7 +46,7 @@
                 <a href="#" data-page="news">News & Schedule</a>
             </div>
             <div class="nav-actions">
-                <button class="outline-btn small desktop-only" style="margin-right:0.5rem" onclick="document.querySelector('[data-page=\\'tracker\\']').click()">Log In</button>
+                <button class="outline-btn small desktop-only" style="margin-right:0.5rem" onclick="document.querySelector('[data-page=&quot;tracker&quot;]').click()">Log In</button>
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle Theme">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
@@ -120,7 +120,7 @@
         <section id="view-community" class="view pt-md">
             <div class="section-header" style="justify-content: space-between">
                 <div class="section-title-wrap"><h2>Community Forums</h2><p class="subtitle">Real-time discussions pulled from AniList networks.</p></div>
-                <button class="primary-btn" onclick="document.querySelector('.toast-container').innerHTML += '<div class=\\'toast\\' style=\\'border-color:var(--accent-hover)\\'>Requires OAuth Login to post.</div>'">+ Create Thread</button>
+                <button class="primary-btn" onclick="showToast('Requires OAuth Login to post.', 'warning')">+ Create Thread</button>
             </div>
             <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
                 <div class="forum-list" id="forum-list"><div class="loader"></div></div>
@@ -146,10 +146,27 @@
                 <h2 style="font-size:2.5rem; margin-bottom:0.5rem">Login Required</h2>
                 <p class="text-muted" style="margin-bottom:2rem">Please authenticate with your AniList account to access your personal tracking database, analytics, and lists.</p>
                 
-                <button class="primary-btn large" style="width:100%; background:#020617; border: 1px solid #334155; margin-bottom:1rem" onclick="window.open('https://anilist.co/api/v2/oauth/authorize?client_id=1234&response_type=token', '_blank')">
+                <button class="primary-btn large" style="width:100%; background:#020617; border: 1px solid #334155; margin-bottom:1rem" onclick="window.mockLogin()">
                     <span style="font-weight:700">Login with AniList</span>
                 </button>
                 <p class="text-muted" style="font-size:0.8rem">OAuth2 Secured Authentication via AniList.co</p>
+            </div>
+            
+            <div id="tracker-dashboard" style="display:none;">
+                <div class="section-header">
+                    <h2>Welcome to your Tracker!</h2>
+                    <button class="outline-btn" onclick="window.location.reload()">Log Out</button>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div class="glass-panel text-center"><h3>142</h3><p class="text-muted">Total Anime</p></div>
+                    <div class="glass-panel text-center"><h3>1,842</h3><p class="text-muted">Episodes</p></div>
+                    <div class="glass-panel text-center"><h3>38.4</h3><p class="text-muted">Days Watched</p></div>
+                </div>
+                <div class="section-header"><h3>Recently Updated</h3></div>
+                <div class="media-grid" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="media-card"><img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCDignzjAQeS.jpg" style="width:100%; height:200px; object-fit:cover; border-radius:4px"><div class="card-content"><h4 style="margin: 0.5rem 0">One Piece</h4><p class="text-muted" style="font-size:0.8rem; color: var(--success)">Episode 1089</p></div></div>
+                    <div class="media-card"><img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-bbBWj4pEFseh.jpg" style="width:100%; height:200px; object-fit:cover; border-radius:4px"><div class="card-content"><h4 style="margin: 0.5rem 0">Jujutsu Kaisen</h4><p class="text-muted" style="font-size:0.8rem; color: var(--success)">Completed</p></div></div>
+                </div>
             </div>
         </section>
 
