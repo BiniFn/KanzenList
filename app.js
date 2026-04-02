@@ -86,7 +86,14 @@ function setupDatabaseFilters() {
         const genre = document.getElementById('filter-genre').value;
         
         let variables = { page: 1, perPage: 24, type, sort: [sort] };
-        if(genre) variables.genre_in = [genre];
+        
+        if (genre) {
+            if (genre === 'Isekai') {
+                variables.tag_in = ['Isekai'];
+            } else {
+                variables.genre_in = [genre];
+            }
+        }
 
         const container = document.getElementById('db-grid');
         container.innerHTML = '<div class="loader"></div>';

@@ -29,10 +29,10 @@ const QUERIES = {
         }
     `,
     DATABASE: `
-        query ($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort], $genre_in: [String]) {
+        query ($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort], $genre_in: [String], $tag_in: [String]) {
             Page(page: $page, perPage: $perPage) {
                 pageInfo { total hasNextPage }
-                media(type: $type, sort: $sort, genre_in: $genre_in, isAdult: false, format_not: MUSIC) {
+                media(type: $type, sort: $sort, genre_in: $genre_in, tag_in: $tag_in, isAdult: false, format_not: MUSIC) {
                     ${MEDIA_FIELDS}
                     description(asHtml: true)
                 }
