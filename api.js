@@ -92,6 +92,34 @@ const QUERIES = {
                 }
             }
         }
+    `,
+    USER_STATS: `
+        query ($name: String) {
+            User(name: $name) {
+                id
+                name
+                avatar { large }
+                statistics {
+                    anime { count episodesWatched minutesWatched }
+                }
+            }
+        }
+    `,
+    USER_LIST: `
+        query ($userId: Int) {
+            MediaListCollection(userId: $userId, type: ANIME, sort: UPDATED_TIME_DESC, perChunk: 10) {
+                lists {
+                    entries {
+                        media {
+                            id
+                            title { english romaji }
+                            coverImage { large color }
+                        }
+                        progress
+                    }
+                }
+            }
+        }
     `
 };
 

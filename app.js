@@ -74,8 +74,18 @@ export function showToast(message, type = 'info') {
 // ------ HOME / DISCOVER ------
 async function loadHomeData() {
     loadedViews.home = true;
-    const trendingData = await fetchAniList('DISCOVER', { page: 1, perPage: 24, sort: ['TRENDING_DESC'], type: 'ANIME' });
+    
+    // Trending
+    const trendingData = await fetchAniList('DISCOVER', { page: 1, perPage: 12, sort: ['TRENDING_DESC'], type: 'ANIME' });
     renderMediaGrid(trendingData?.Page?.media, document.getElementById('trending-grid'));
+
+    // Popular
+    const popularData = await fetchAniList('DISCOVER', { page: 1, perPage: 12, sort: ['POPULARITY_DESC'], type: 'ANIME' });
+    renderMediaGrid(popularData?.Page?.media, document.getElementById('popular-grid'));
+    
+    // Trending Manga
+    const mangaData = await fetchAniList('DISCOVER', { page: 1, perPage: 12, sort: ['TRENDING_DESC'], type: 'MANGA' });
+    renderMediaGrid(mangaData?.Page?.media, document.getElementById('manga-grid'));
 }
 
 // ------ DATABASE / SEARCH ------
@@ -239,14 +249,54 @@ window.openDetails = async function(id) {
     `;
 };
 
-window.mockLogin = function() {
-    showToast("Authenticated Layout Preview", "success");
-    document.querySelector('.auth-prompt') || document.querySelector('#view-tracker > .glass-panel').style.setProperty('display', 'none');
+window.fetchUserTracker = async function() {
+    const username = document.getElementById('username-input').value;
+    if(!username) return showToast("Please enter a username", "warning");
+
+    const loadingBtn = document.getElementById('auth-btn');
+    loadingBtn.innerHTML = 'Fetching Data...';
+
+    const userData = await fetchAniList('USER_STATS', { name: username });
+    if(!userData || !userData.User) {
+        loadingBtn.innerHTML = 'Connect via Username';
+        return showToast("User not found!", "warning");
+    }
+
+    const u = userData.User;
+    const stats = u.statistics.anime;
+    const daysWatched = (stats.minutesWatched / 60 / 24).toFixed(1);
+
+    document.getElementById('tracker-stats').innerHTML = `
+        <div class="glass-panel text-center"><h3>${stats.count}</h3><p class="text-muted">Total Anime</p></div>
+        <div class="glass-panel text-center"><h3>${stats.episodesWatched.toLocaleString()}</h3><p class="text-muted">Episodes</p></div>
+        <div class="glass-panel text-center"><h3>${daysWatched}</h3><p class="text-muted">Days Watched</p></div>
+    `;
+
+    document.getElementById('tracker-avatar').src = u.avatar.large;
+    document.getElementById('tracker-name').textContent = u.name + "'s Tracker";
+
+    document.querySelector('#view-tracker > .glass-panel').style.display = 'none';
     document.getElementById('tracker-dashboard').style.display = 'block';
     
-    // Switch nav button
-    const loginBtn = document.querySelector('.nav-actions button.desktop-only');
-    if(loginBtn) loginBtn.textContent = 'My Profile';
+    // Fetch recent lists
+    const listData = await fetchAniList('USER_LIST', { userId: u.id });
+    const entries = listData?.MediaListCollection?.lists[0]?.entries || [];
+    
+    const recentGrid = document.getElementById('tracker-recent');
+    recentGrid.innerHTML = '';
+    
+    entries.slice(0, 8).forEach(entry => {
+        const title = entry.media.title.english || entry.media.title.romaji;
+        recentGrid.innerHTML += `
+            <div class="media-card" onclick="window.openDetails(${entry.media.id})">
+                <img src="${entry.media.coverImage.large}" style="width:100%; height:200px; object-fit:cover; border-radius:4px">
+                <div class="card-content">
+                    <h4 style="margin: 0.5rem 0; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${title}">${title}</h4>
+                    <p class="text-muted" style="font-size:0.8rem; color: var(--success)">Progress: ${entry.progress} Ep</p>
+                </div>
+            </div>
+        `;
+    });
 };
 
 function renderMediaGrid(list, container) {

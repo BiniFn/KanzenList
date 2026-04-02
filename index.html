@@ -66,6 +66,10 @@
             </div>
             <div class="section-header mt-md"><h2>Trending Now</h2></div>
             <div class="media-grid" id="trending-grid"><div class="loader"></div></div>
+            <div class="section-header mt-xl"><h2>Popular All-Time</h2></div>
+            <div class="media-grid" id="popular-grid"><div class="loader"></div></div>
+            <div class="section-header mt-xl"><h2>Trending Manga</h2></div>
+            <div class="media-grid" id="manga-grid"><div class="loader"></div></div>
         </section>
 
         <!-- 2. DATABASE / ADVANCED SEARCH VIEW -->
@@ -142,30 +146,29 @@
 
         <!-- 5. TRACKER / LOGIN VIEW -->
         <section id="view-tracker" class="view pt-md">
-            <div class="glass-panel text-center" style="max-width: 500px; margin: 4rem auto; padding: 4rem 2rem">
-                <h2 style="font-size:2.5rem; margin-bottom:0.5rem">Login Required</h2>
-                <p class="text-muted" style="margin-bottom:2rem">Please authenticate with your AniList account to access your personal tracking database, analytics, and lists.</p>
+            <div class="glass-panel text-center auth-prompt" style="max-width: 500px; margin: 4rem auto; padding: 4rem 2rem">
+                <h2 style="font-size:2.5rem; margin-bottom:0.5rem">Fetch Tracker</h2>
+                <p class="text-muted" style="margin-bottom:2rem">Enter any public AniList username to view their real-time statistics and recent list updates.</p>
                 
-                <button class="primary-btn large" style="width:100%; background:#020617; border: 1px solid #334155; margin-bottom:1rem" onclick="window.mockLogin()">
-                    <span style="font-weight:700">Login with AniList</span>
+                <input type="text" id="username-input" placeholder="Anilist Username (e.g. BiniFn, Josh)" style="width:100%; border-radius:8px; padding:1rem; border:1px solid #334155; background:#020617; color:white; margin-bottom: 1rem;">
+                <button class="primary-btn large" id="auth-btn" style="width:100%; margin-bottom:1rem" onclick="window.fetchUserTracker()">
+                    <span style="font-weight:700">Fetch Profile</span>
                 </button>
-                <p class="text-muted" style="font-size:0.8rem">OAuth2 Secured Authentication via AniList.co</p>
             </div>
             
             <div id="tracker-dashboard" style="display:none;">
-                <div class="section-header">
-                    <h2>Welcome to your Tracker!</h2>
-                    <button class="outline-btn" onclick="window.location.reload()">Log Out</button>
+                <div class="section-header" style="justify-content: space-between">
+                    <div style="display:flex; align-items:center; gap: 1rem">
+                        <img id="tracker-avatar" src="" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                        <h2 id="tracker-name">Your Tracker!</h2>
+                    </div>
+                    <button class="outline-btn" onclick="window.location.reload()">Disconnect</button>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
-                    <div class="glass-panel text-center"><h3>142</h3><p class="text-muted">Total Anime</p></div>
-                    <div class="glass-panel text-center"><h3>1,842</h3><p class="text-muted">Episodes</p></div>
-                    <div class="glass-panel text-center"><h3>38.4</h3><p class="text-muted">Days Watched</p></div>
+                <div id="tracker-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                 </div>
                 <div class="section-header"><h3>Recently Updated</h3></div>
-                <div class="media-grid" style="grid-template-columns: repeat(4, 1fr);">
-                    <div class="media-card"><img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCDignzjAQeS.jpg" style="width:100%; height:200px; object-fit:cover; border-radius:4px"><div class="card-content"><h4 style="margin: 0.5rem 0">One Piece</h4><p class="text-muted" style="font-size:0.8rem; color: var(--success)">Episode 1089</p></div></div>
-                    <div class="media-card"><img src="https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx113415-bbBWj4pEFseh.jpg" style="width:100%; height:200px; object-fit:cover; border-radius:4px"><div class="card-content"><h4 style="margin: 0.5rem 0">Jujutsu Kaisen</h4><p class="text-muted" style="font-size:0.8rem; color: var(--success)">Completed</p></div></div>
+                <div class="media-grid" id="tracker-recent" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="loader"></div>
                 </div>
             </div>
         </section>
