@@ -51,4 +51,9 @@ The project comes pre-configured with a highly optimized `vercel.json` manifest.
 
 ---
 
+## 📜 License
+**All Rights Reserved.** 
+
+This software is **proprietary and closed-source**. You may not copy, reproduce, distribute, publish, display, perform, modify, create derivative works, transmit, or in any way exploit any such content without explicit, written permission from the copyright holder. Unauthorized reproduction or distribution is strictly prohibited. Refer to the `LICENSE` file for more details.
+
 > Created intuitively as a lightweight, supreme alternative to monolithic native applications. All Data provided by [AniList](https://anilist.co) and [Jikan](https://jikan.moe/).
