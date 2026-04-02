@@ -76,11 +76,8 @@ export function showToast(message, type = 'info') {
 // ------ HOME / DISCOVER ------
 async function loadHomeData() {
     loadedViews.home = true;
-    const trendingData = await fetchAniList('DISCOVER', { page: 1, perPage: 12, sort: ['TRENDING_DESC'], type: 'ANIME' });
+    const trendingData = await fetchAniList('DISCOVER', { page: 1, perPage: 24, sort: ['TRENDING_DESC'], type: 'ANIME' });
     renderMediaGrid(trendingData?.Page?.media, document.getElementById('trending-grid'));
-
-    const isekaiData = await fetchAniList('DISCOVER', { page: 1, perPage: 12, sort: ['POPULARITY_DESC'], type: 'ANIME', genre: 'Isekai' });
-    renderMediaGrid(isekaiData?.Page?.media, document.getElementById('isekai-grid'));
 }
 
 // ------ DATABASE / SEARCH ------
@@ -90,7 +87,7 @@ function setupDatabaseFilters() {
         const sort = document.getElementById('filter-sort').value;
         const genre = document.getElementById('filter-genre').value;
         
-        const variables = { page: 1, perPage: 24, type, sort: [sort] };
+        let variables = { page: 1, perPage: 24, type, sort: [sort] };
         if(genre) variables.genre_in = [genre];
 
         const container = document.getElementById('db-grid');
@@ -199,17 +196,47 @@ function renderNewsCards(newsList, container) {
 
 // ------ UTILITY RENDERERS ------
 window.openDetails = async function(id) {
-    // Basic implementation since we refactored
     navLinks.forEach(l => l.classList.remove('active'));
     Object.values(views).forEach(v => v.classList.remove('active-view'));
     views.details.classList.add('active-view');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
+    document.getElementById('details-container').innerHTML = '<div class="loader"></div>';
+    
+    const data = await fetchAniList('DETAILS', { id });
+    const media = data?.Media;
+    
+    if(!media) {
+        document.getElementById('details-container').innerHTML = '<p class="text-center text-muted">Failed to load details.</p>';
+        return;
+    }
+
+    const title = media.title.english || media.title.romaji;
+    const color = media.coverImage.color || 'var(--accent-primary)';
+    const banner = media.bannerImage || media.coverImage.extraLarge;
+    
+    let trailerHTML = '';
+    if (media.trailer && media.trailer.site === 'youtube') {
+        trailerHTML = `<button class="outline-btn mt-md" onclick="window.open('https://youtube.com/watch?v=${media.trailer.id}', '_blank')">▶ Watch Trailer</button>`;
+    }
+
     document.getElementById('details-container').innerHTML = `
-        <div class="text-center mt-xl">
-            <h2>Detailed DB Entry</h2>
-            <p class="text-muted">Opening Anime ID: ${id}</p>
-            <p class="text-muted">In V2, details load instantaneously using the database caches.</p>
+        <div class="details-header" style="background-image: url('${banner}');"></div>
+        <div class="details-content">
+            <img src="${media.coverImage.extraLarge}" class="details-poster">
+            <div class="details-info">
+                <h1 style="font-size:2.5rem; margin-bottom:0.5rem">${title}</h1>
+                <div class="details-tags mb-md">
+                    ${media.genres.map(g => `<span class="genre-tag" style="background: ${color}20; color: ${color}; border: 1px solid ${color}40">${g}</span>`).join('')}
+                </div>
+                <div class="details-stats mb-lg" style="display: flex; gap: 2rem;">
+                    <div><strong style="color: var(--warning)">${media.averageScore || '?'}%</strong><br>Score</div>
+                    <div><strong style="color: var(--accent-hover)">#${media.popularity.toLocaleString()}</strong><br>Popularity</div>
+                </div>
+                <div class="details-desc">${media.description || 'No description available for this series.'}</div>
+                ${trailerHTML}
+                <button class="primary-btn mt-md ml-sm" onclick="showToast('Added to your tracking list!', 'success')">Add to My List</button>
+            </div>
         </div>
     `;
 };

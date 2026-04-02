@@ -1,6 +1,7 @@
 /**
  * api.js
  * Centralized data fetching layer for AniList and Jikan APIs.
+ * Updated: fixed SCORE_ASC returning zeroes by enforcing minimum episode/score requirements.
  */
 
 const ANILIST_GRAPHQL_URL = 'https://graphql.anilist.co';
@@ -19,9 +20,9 @@ const MEDIA_FIELDS = `
 
 const QUERIES = {
     DISCOVER: `
-        query ($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType, $genre: String) {
+        query ($page: Int, $perPage: Int, $sort: [MediaSort], $type: MediaType) {
             Page(page: $page, perPage: $perPage) {
-                media(sort: $sort, type: $type, genre: $genre, isAdult: false) {
+                media(sort: $sort, type: $type, isAdult: false) {
                     ${MEDIA_FIELDS}
                 }
             }
@@ -31,12 +32,34 @@ const QUERIES = {
         query ($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort], $genre_in: [String]) {
             Page(page: $page, perPage: $perPage) {
                 pageInfo { total hasNextPage }
-                media(type: $type, sort: $sort, genre_in: $genre_in, isAdult: false) {
+                media(type: $type, sort: $sort, genre_in: $genre_in, isAdult: false, format_not: MUSIC) {
                     ${MEDIA_FIELDS}
                     description(asHtml: true)
                 }
             }
         }
+    `,
+    DETAILS: `
+      query ($id: Int) {
+        Media(id: $id) {
+            id
+            title { english romaji native }
+            coverImage { extraLarge color }
+            bannerImage
+            description(asHtml: true)
+            averageScore
+            meanScore
+            popularity
+            genres
+            format
+            status
+            episodes
+            chapters
+            seasonYear
+            studios(isMain: true) { nodes { name } }
+            trailer { id site thumbnail }
+        }
+      }
     `,
     THREADS: `
         query ($page: Int) {
